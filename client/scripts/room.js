@@ -3,11 +3,13 @@ var $ = $;
 
 var room = (function () {
 
-  var Room = function (name) {
+  var Room = function (name, selector) {
     this.name = name;
     this.messages = [];
     this.currentUsers = []; // Perhaps
+    this.selector = selector;
 
+    this.getMessages();
     setInterval(_.bind(this.getMessages, this), 1000);
   };
 
@@ -28,6 +30,9 @@ var room = (function () {
 
   Room.prototype.getMessages = function () {
     var that = this;
+    var selector = this.selector || function (datum) {
+          return datum.roomname === that.name;
+        };
     $.ajax({
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'GET',
@@ -41,9 +46,7 @@ var room = (function () {
         data = _.map(data.results, function (datum) {
           return new message.Message(datum.username, datum.text, datum.roomname);
         });
-        that.messages = _.filter(data, function (datum) {
-          return datum.roomname === datum.name;
-        });
+        that.messages = _.filter(data, selector);
       },
       error: function () {
         console.log('Chatterbox: Failed to get messages.');
@@ -51,8 +54,8 @@ var room = (function () {
     });
   };
 
-  var PrivateRoom = function (name, allowedUsers) {
-    Room.call(this, name);
+  var PrivateRoom = function (name, selector, allowedUsers) {
+    Room.call(this, name, selector);
     this._allowedUsers = allowedUsers;
   };
 
@@ -68,8 +71,8 @@ var room = (function () {
     }
   };
 
-  var PublicRoom = function (name) {
-    Room.call(this, name);
+  var PublicRoom = function (name, selector) {
+    Room.call(this, name, selector);
     PublicRoom.all[this.name] = this;
   };
 
@@ -82,8 +85,23 @@ var room = (function () {
     delete PublicRoom.all[this.name];
   };
 
+  var UserRoom = function (username) {
+    Room.call(this, username);
+  };
+
+  UserRoom.prototype = Object.create(Room.prototype);
+  UserRoom.prototype.constructor = UserRoom;
+
+  UserRoom.prototype.getMessages = function () {
+    var that = this;
+    Room.prototype.getMessages.call(this, function (message) {
+      return message.user === that.name;
+    });
+  };
+
   return {
     PrivateRoom: PrivateRoom,
-    PublicRoom: PublicRoom
+    PublicRoom: PublicRoom,
+    UserRoom: UserRoom
   };
 }());
