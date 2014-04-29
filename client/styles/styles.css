@@ -91,3 +91,7 @@ form input[type=text] {
     height: 500px;
     background-color: grey;
 }
+
+.friend {
+    color: blue;
+}
