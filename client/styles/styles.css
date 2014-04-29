@@ -83,11 +83,11 @@ form input[type=text] {
     padding: 10px;
 }
 
-.sidebar {
+#sidebar {
     position: fixed;
     top: 10px;
     left: 20px;
     width: 100px;
     height: 500px;
-    background-color: black;
+    background-color: grey;
 }
