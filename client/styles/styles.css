@@ -5,6 +5,17 @@ body {
     font-family: arial, sans-serif;
 }
 
+label {
+    width: 30%;
+    display: inline-block;
+    float: left;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0px;
+}
+
 #main {
     width: 500px;
     margin: auto;
@@ -24,10 +35,6 @@ body {
 
 #main h1 span {
     font-style:italic;
-}
-
-#main ul {
-    padding-left: 20px;
 }
 
 #main .error {
@@ -54,7 +61,7 @@ form {
 
 form input[type=text] {
     margin-right: 10px;
-    width: 70%;
+    width: 65%;
     font-size: 12px;
     padding: 5px;
 }
