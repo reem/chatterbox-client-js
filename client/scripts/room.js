@@ -10,7 +10,7 @@ var room = (function () {
     this.selector = selector;
 
     this.getMessages();
-    setInterval(_.bind(this.getMessages, this), 1000);
+    setInterval(_.bind(this.getMessages, this), 500);
   };
 
   Room.prototype.postMessage = function (message) {
@@ -31,14 +31,14 @@ var room = (function () {
   Room.prototype.getMessages = function () {
     var that = this;
     var selector = this.selector || function (datum) {
-          return datum.roomname === that.name;
+          return datum.room === that.name;
         };
     $.ajax({
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'GET',
       data: {
         order: '-createAt',
-        limit: 30,
+        limit: 100,
       },
       contentType: 'application/json',
       success: function (data) {
