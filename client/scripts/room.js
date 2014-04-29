@@ -1,9 +1,14 @@
+var _ = _;
+var $ = $;
+
 var room = (function () {
 
   var Room = function (name) {
     this.name = name;
     this.messages = [];
     this.currentUsers = []; // Perhaps
+
+    setInterval(_.bind(this.getMessages, this), 1000);
   };
 
   Room.prototype.postMessage = function (message) {
@@ -19,6 +24,31 @@ var room = (function () {
     if (indexOfUser !== -1) {
       this.currentUsers.splice(indexOfUser, 1);
     }
+  };
+
+  Room.prototype.getMessages = function () {
+    var that = this;
+    $.ajax({
+      url: 'https://api.parse.com/1/classes/chatterbox',
+      type: 'GET',
+      data: {
+        order: '-createAt',
+        limit: 30,
+      },
+      contentType: 'application/json',
+      success: function (data) {
+        console.log('Chatterbox: Messages Received!');
+        data = _.map(data.results, function (datum) {
+          return new message.Message(datum.username, datum.text, datum.roomname);
+        });
+        that.messages = _.filter(data, function (datum) {
+          return datum.roomname === datum.name;
+        });
+      },
+      error: function () {
+        console.log('Chatterbox: Failed to get messages.');
+      }
+    });
   };
 
   var PrivateRoom = function (name, allowedUsers) {
